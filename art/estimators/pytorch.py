@@ -40,11 +40,11 @@ class PyTorchEstimator(NeuralNetworkMixin, LossGradientsMixin, BaseEstimator):
         BaseEstimator.estimator_params
         + NeuralNetworkMixin.estimator_params
         + [
-            "device_type",
+            "device",
         ]
     )
 
-    def __init__(self, device_type: str = "gpu", **kwargs) -> None:
+    def __init__(self, device: str = "cpu", **kwargs) -> None:
         """
         Estimator class for PyTorch models.
 
@@ -58,7 +58,7 @@ class PyTorchEstimator(NeuralNetworkMixin, LossGradientsMixin, BaseEstimator):
         :param preprocessing: Tuple of the form `(subtrahend, divisor)` of floats or `np.ndarray` of values to be
                used for data preprocessing. The first value will be subtracted from the input. The input will then
                be divided by the second one.
-        :param device_type: Type of device on which the classifier is run, either `gpu` or `cpu`.
+        :param device: Device on which the classifier is run, either `cuda:x` or `cpu`.
         """
         import torch
 
@@ -67,30 +67,23 @@ class PyTorchEstimator(NeuralNetworkMixin, LossGradientsMixin, BaseEstimator):
             from art.preprocessing.standardisation_mean_std.pytorch import StandardisationMeanStdPyTorch
 
             kwargs["preprocessing"] = StandardisationMeanStdPyTorch(
-                mean=preprocessing[0], std=preprocessing[1], device_type=device_type
+                mean=preprocessing[0], std=preprocessing[1], device=device
             )
 
         super().__init__(**kwargs)
 
-        self._device_type = device_type
-
-        # Set device
-        if device_type == "cpu" or not torch.cuda.is_available():
-            self._device = torch.device("cpu")
-        else:  # pragma: no cover
-            cuda_idx = torch.cuda.current_device()
-            self._device = torch.device(f"cuda:{cuda_idx}")
+        self._device = device
 
         PyTorchEstimator._check_params(self)
 
     @property
-    def device_type(self) -> str:
+    def device(self) -> str:
         """
-        Return the type of device on which the estimator is run.
+        Return the device on which the estimator is run.
 
-        :return: Type of device on which the estimator is run, either `gpu` or `cpu`.
+        :return: Device on which the estimator is run, either `cuda:x` or `cpu`.
         """
-        return self._device_type  # type: ignore
+        return self._device  # type: ignore
 
     def predict(self, x: np.ndarray, batch_size: int = 128, **kwargs):
         """

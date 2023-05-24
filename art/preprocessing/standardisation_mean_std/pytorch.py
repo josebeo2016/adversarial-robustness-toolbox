@@ -46,7 +46,7 @@ class StandardisationMeanStdPyTorch(PreprocessorPyTorch):
         std: Union[float, np.ndarray] = 1.0,
         apply_fit: bool = True,
         apply_predict: bool = True,
-        device_type: str = "gpu",
+        device: str = "cpu",
     ):
         """
         Create an instance of StandardisationMeanStdPyTorch.
@@ -56,7 +56,7 @@ class StandardisationMeanStdPyTorch(PreprocessorPyTorch):
         """
 
         super().__init__(
-            device_type=device_type,
+            device=device,
             is_fitted=True,
             apply_fit=apply_fit,
             apply_predict=apply_predict,

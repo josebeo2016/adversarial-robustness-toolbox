@@ -84,7 +84,7 @@ class PyTorchClassifier(ClassGradientsMixin, ClassifierMixin, PyTorchEstimator):
         preprocessing_defences: Union["Preprocessor", List["Preprocessor"], None] = None,
         postprocessing_defences: Union["Postprocessor", List["Postprocessor"], None] = None,
         preprocessing: "PREPROCESSING_TYPE" = (0.0, 1.0),
-        device_type: str = "gpu",
+        device: str = "cpu",
     ) -> None:
         """
         Initialization specifically for the PyTorch-based implementation.
@@ -114,7 +114,7 @@ class PyTorchClassifier(ClassGradientsMixin, ClassifierMixin, PyTorchEstimator):
         :param preprocessing: Tuple of the form `(subtrahend, divisor)` of floats or `np.ndarray` of values to be
                used for data preprocessing. The first value will be subtracted from the input. The input will then
                be divided by the second one.
-        :param device_type: Type of device on which the classifier is run, either `gpu` or `cpu`.
+        :param device: Device on which the classifier is run, either `cuda:x` or `cpu`.
         """
         import torch
 
@@ -125,7 +125,7 @@ class PyTorchClassifier(ClassGradientsMixin, ClassifierMixin, PyTorchEstimator):
             preprocessing_defences=preprocessing_defences,
             postprocessing_defences=postprocessing_defences,
             preprocessing=preprocessing,
-            device_type=device_type,
+            device=device,
         )
         self.nb_classes = nb_classes
         self._input_shape = input_shape
@@ -180,7 +180,7 @@ class PyTorchClassifier(ClassGradientsMixin, ClassifierMixin, PyTorchEstimator):
                 parameters = self._model.parameters()
                 self._optimizer = torch.optim.SGD(parameters, lr=0.01)
 
-            if self.device.type == "cpu":
+            if self.device == "cpu":
                 enabled = False
             else:
                 enabled = True
@@ -1097,7 +1097,6 @@ class PyTorchClassifier(ClassGradientsMixin, ClassifierMixin, PyTorchEstimator):
         self._model = self._make_model_wrapper(model)
 
         # Recover device
-        self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self._model.to(self._device)
 
         # Recover optimizer
