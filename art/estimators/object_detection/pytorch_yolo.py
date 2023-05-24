@@ -142,7 +142,7 @@ class PyTorchYolo(ObjectDetectorMixin, PyTorchEstimator):
             "loss_objectness",
             "loss_rpn_box_reg",
         ),
-        device_type: str = "gpu",
+        device: str = "cpu",
     ):
         """
         Initialization.
@@ -169,8 +169,7 @@ class PyTorchYolo(ObjectDetectorMixin, PyTorchEstimator):
                be divided by the second one.
         :param attack_losses: Tuple of any combination of strings of loss components: 'loss_classifier', 'loss_box_reg',
                               'loss_objectness', and 'loss_rpn_box_reg'.
-        :param device_type: Type of device to be used for model and tensors, if `cpu` run on CPU, if `gpu` run on GPU
-                            if available otherwise run on CPU.
+        :param device: Device to be used for model and tensors, `cpu` or `cuda:x`.
         """
         import torch
         import torchvision
@@ -193,7 +192,7 @@ class PyTorchYolo(ObjectDetectorMixin, PyTorchEstimator):
             preprocessing_defences=preprocessing_defences,
             postprocessing_defences=postprocessing_defences,
             preprocessing=preprocessing,
-            device_type=device_type,
+            device=device,
         )
 
         self._input_shape = input_shape

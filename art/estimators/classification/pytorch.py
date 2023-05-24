@@ -143,7 +143,8 @@ class PyTorchClassifier(ClassGradientsMixin, ClassifierMixin, PyTorchEstimator):
 
         # Get the internal layers
         self._layer_names: List[str] = self._model.get_layers  # type: ignore
-
+        
+        self._device = torch.device(device)
         self._model.to(self._device)
 
         # Index of layer at which the class gradients should be calculated

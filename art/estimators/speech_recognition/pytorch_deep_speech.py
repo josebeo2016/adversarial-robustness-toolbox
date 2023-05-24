@@ -78,7 +78,7 @@ class PyTorchDeepSpeech(PytorchSpeechRecognizerMixin, SpeechRecognizerMixin, PyT
         preprocessing_defences: Union["Preprocessor", List["Preprocessor"], None] = None,
         postprocessing_defences: Union["Postprocessor", List["Postprocessor"], None] = None,
         preprocessing: "PREPROCESSING_TYPE" = None,
-        device_type: str = "gpu",
+        device: str = "cpu",
         verbose: bool = True,
     ):
         """
@@ -124,8 +124,7 @@ class PyTorchDeepSpeech(PytorchSpeechRecognizerMixin, SpeechRecognizerMixin, PyT
         :param preprocessing: Tuple of the form `(subtrahend, divisor)` of floats or `np.ndarray` of values to be
                used for data preprocessing. The first value will be subtracted from the input. The input will then
                be divided by the second one.
-        :param device_type: Type of device to be used for model and tensors, if `cpu` run on CPU, if `gpu` run on GPU
-                            if available otherwise run on CPU.
+        :param device: Device to be used for model and tensors, `cpu` or `cuda:x`.
         """
         import torch
         from deepspeech_pytorch.model import DeepSpeech
@@ -165,12 +164,7 @@ class PyTorchDeepSpeech(PytorchSpeechRecognizerMixin, SpeechRecognizerMixin, PyT
             raise ValueError("This estimator does not support `postprocessing_defences`.")
 
         # Set cpu/gpu device
-        self._device: torch.device
-        if device_type == "cpu" or not torch.cuda.is_available():
-            self._device = torch.device("cpu")
-        else:  # pragma: no cover
-            cuda_idx = torch.cuda.current_device()
-            self._device = torch.device(f"cuda:{cuda_idx}")
+        self._device: torch.device(device)
 
         self._input_shape = None
 

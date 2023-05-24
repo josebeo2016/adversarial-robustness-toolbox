@@ -58,7 +58,7 @@ class PyTorchFasterRCNN(PyTorchObjectDetector):
             "loss_objectness",
             "loss_rpn_box_reg",
         ),
-        device_type: str = "gpu",
+        device: str = "cpu",
     ):
         """
         Initialization.
@@ -84,8 +84,7 @@ class PyTorchFasterRCNN(PyTorchObjectDetector):
                be divided by the second one.
         :param attack_losses: Tuple of any combination of strings of loss components: 'loss_classifier', 'loss_box_reg',
                               'loss_objectness', and 'loss_rpn_box_reg'.
-        :param device_type: Type of device to be used for model and tensors, if `cpu` run on CPU, if `gpu` run on GPU
-                            if available otherwise run on CPU.
+        :param device: Device to be used for model and tensors, 'cpu' or 'cuda:x'.
         """
         import torchvision
 
@@ -104,5 +103,5 @@ class PyTorchFasterRCNN(PyTorchObjectDetector):
             postprocessing_defences=postprocessing_defences,
             preprocessing=preprocessing,
             attack_losses=attack_losses,
-            device_type=device_type,
+            device=device,
         )

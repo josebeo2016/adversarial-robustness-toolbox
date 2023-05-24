@@ -50,11 +50,11 @@ class ConvertedModel(torch.nn.Module):
     which uses abstract operations
     """
 
-    def __init__(self, model: "torch.nn.Module", channels_first: bool, input_shape: Tuple[int, ...]):
+    def __init__(self, model: "torch.nn.Module", channels_first: bool, input_shape: Tuple[int, ...],device="cpu"):
         super().__init__()
         modules = []
         self.interim_shapes: List[Tuple] = []
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device(device)
         self.forward_mode: str
         self.forward_mode = "abstract"
         self.reshape_op_num = -1
@@ -229,7 +229,7 @@ class PyTorchIBPClassifier(PyTorchIntervalBounds, PyTorchClassifier):
         preprocessing_defences: Union["Preprocessor", List["Preprocessor"], None] = None,
         postprocessing_defences: Union["Postprocessor", List["Postprocessor"], None] = None,
         preprocessing: "PREPROCESSING_TYPE" = (0.0, 1.0),
-        device_type: str = "gpu",
+        device: str = "cpu",
         concrete_to_interval: Optional[Callable] = None,
     ):
         """
@@ -252,7 +252,7 @@ class PyTorchIBPClassifier(PyTorchIntervalBounds, PyTorchClassifier):
         :param preprocessing: Tuple of the form `(subtrahend, divisor)` of floats or `np.ndarray` of values to be
                used for data preprocessing. The first value will be subtracted from the input. The input will then
                be divided by the second one.
-        :param device_type: Type of device on which the classifier is run, either `gpu` or `cpu`.
+        :param device: Device on which the classifier is run, either `cuda:x` or `cpu`.
         :param concrete_to_interval:  Optional argument. Function which takes in a concrete data point and the bound
                                       and converts the datapoint to the interval domain via:
 
@@ -269,7 +269,7 @@ class PyTorchIBPClassifier(PyTorchIntervalBounds, PyTorchClassifier):
             "directly building a certifier network with the "
             "custom layers found in art.estimators.certification.interval.interval.py\n"
         )
-        converted_model = ConvertedModel(model, channels_first, input_shape)
+        converted_model = ConvertedModel(model, channels_first, input_shape, device=device)
 
         if TYPE_CHECKING:
             converted_optimizer: Union[torch.optim.Adam, torch.optim.SGD, None]
@@ -301,7 +301,7 @@ class PyTorchIBPClassifier(PyTorchIntervalBounds, PyTorchClassifier):
             preprocessing_defences=preprocessing_defences,
             postprocessing_defences=postprocessing_defences,
             preprocessing=preprocessing,
-            device_type=device_type,
+            device=device,
         )
 
     def predict_intervals(  # pylint: disable=W0613
